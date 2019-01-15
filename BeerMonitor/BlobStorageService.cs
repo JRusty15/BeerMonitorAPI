@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
@@ -37,5 +39,28 @@ namespace BeerMonitor
             }
         }
 
+        public async Task<List<BeerTempAndHumidity>> GetRecentValues()
+        {
+            try
+            {
+                var todayDateKey = DateTime.Today.ToString("MMddyyyy");
+                var yesterdayDateKey = DateTime.Today.AddDays(-1).ToString("MMddyyyy");
+                var todayQueryFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, todayDateKey);
+                var yesterdayQueryFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, yesterdayDateKey);
+                var combinedFilter = TableQuery.CombineFilters(todayQueryFilter, TableOperators.Or, yesterdayQueryFilter);
+                var query = new TableQuery<BeerTempAndHumidity>().Where(combinedFilter);
+                return (await _beerTable.ExecuteQuerySegmentedAsync(query, null)).Results;
+            }
+            catch(StorageException ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<BeerTempAndHumidity> GetLatest()
+        {
+            return (await GetRecentValues())?.OrderByDescending(x => x.EntryTimestamp).Take(1).First();
+        }
     }
 }

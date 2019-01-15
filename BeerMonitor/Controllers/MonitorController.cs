@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeerMonitor.Controllers
@@ -13,14 +14,24 @@ namespace BeerMonitor.Controllers
         [Route("api/monitor")]
         public async Task<IActionResult> GetRecentValues()
         {
-            return new OkObjectResult("Recent");
+            var results = await blobStorageService.GetRecentValues();
+            if (results != null && results.Any())
+            {
+                return new OkObjectResult(results);
+            }
+            return new NotFoundResult();
         }
 
         [HttpGet]
         [Route("api/monitor/latest")]
         public async Task<IActionResult> GetLatest()
         {
-            return new OkObjectResult("Latest");
+            var result = await blobStorageService.GetLatest();
+            if(result != null)
+            {
+                return new OkObjectResult(result);
+            }
+            return new NotFoundResult();
         }
 
         // POST api/values

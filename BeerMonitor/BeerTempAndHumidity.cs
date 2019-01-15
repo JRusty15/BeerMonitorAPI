@@ -5,12 +5,16 @@ namespace BeerMonitor
 {
     public class BeerTempAndHumidity : TableEntity
     {
+        public BeerTempAndHumidity()
+        {
+        }
+
         public BeerTempAndHumidity(double temperature, double humidity, DateTime timestamp)
         {
             Temperature = temperature;
             Humidity = humidity;
             EntryTimestamp = timestamp.ToString();
-            PartitionKey = timestamp.ToString("MMyyyy");
+            PartitionKey = timestamp.ToString("MMddyyyy");
             RowKey = Guid.NewGuid().ToString();
         }
 
