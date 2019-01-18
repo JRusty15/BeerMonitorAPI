@@ -13,13 +13,13 @@ namespace BeerMonitor
         {
             Temperature = temperature;
             Humidity = humidity;
-            EntryTimestamp = timestamp.ToString();
+            EntryTimestamp = timestamp;
             PartitionKey = timestamp.ToString("MMddyyyy");
             RowKey = Guid.NewGuid().ToString();
         }
 
         public double Temperature { get; set;  }
         public double Humidity { get; set; }
-        public string EntryTimestamp { get; set; }
+        public DateTime EntryTimestamp { get; set; }
     }
 }

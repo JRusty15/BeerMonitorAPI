@@ -49,7 +49,8 @@ namespace BeerMonitor
                 var yesterdayQueryFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, yesterdayDateKey);
                 var combinedFilter = TableQuery.CombineFilters(todayQueryFilter, TableOperators.Or, yesterdayQueryFilter);
                 var query = new TableQuery<BeerTempAndHumidity>().Where(combinedFilter);
-                return (await _beerTable.ExecuteQuerySegmentedAsync(query, null)).Results;
+                var list = (await _beerTable.ExecuteQuerySegmentedAsync(query, null)).Results;
+                return list;
             }
             catch(StorageException ex)
             {
