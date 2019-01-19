@@ -39,15 +39,15 @@ namespace BeerMonitor
             }
         }
 
-        public async Task<List<BeerTempAndHumidity>> GetRecentValues()
+        public async Task<List<BeerTempAndHumidity>> GetRecentValues(int hoursBack = 24)
         {
             try
             {
-                var todayDateKey = DateTime.Today.ToString("MMddyyyy");
-                var yesterdayDateKey = DateTime.Today.AddDays(-1).ToString("MMddyyyy");
-                var todayQueryFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, todayDateKey);
-                var yesterdayQueryFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, yesterdayDateKey);
-                var combinedFilter = TableQuery.CombineFilters(todayQueryFilter, TableOperators.Or, yesterdayQueryFilter);
+                var currentZuluTime = DateTime.Now.ToUniversalTime();
+                var startingZuluTime = DateTime.Now.AddHours(-1 * hoursBack).ToUniversalTime();
+                var startQueryFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThan, startingZuluTime);
+                var endQueryFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThanOrEqual, currentZuluTime);
+                var combinedFilter = TableQuery.CombineFilters(startQueryFilter, TableOperators.And, endQueryFilter);
                 var query = new TableQuery<BeerTempAndHumidity>().Where(combinedFilter);
                 var list = (await _beerTable.ExecuteQuerySegmentedAsync(query, null)).Results;
                 return list;
@@ -61,7 +61,7 @@ namespace BeerMonitor
 
         public async Task<BeerTempAndHumidity> GetLatest()
         {
-            return (await GetRecentValues())?.OrderByDescending(x => x.EntryTimestamp).Take(1).First();
+            return (await GetRecentValues(1))?.OrderByDescending(x => x.EntryTimestamp).Take(1).First();
         }
     }
 }

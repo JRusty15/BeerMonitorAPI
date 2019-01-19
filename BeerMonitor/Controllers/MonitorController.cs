@@ -23,6 +23,18 @@ namespace BeerMonitor.Controllers
         }
 
         [HttpGet]
+        [Route("api/monitor/{hours}")]
+        public async Task<IActionResult> GetRecentValues(int hours)
+        {
+            var results = await blobStorageService.GetRecentValues(hours);
+            if (results != null && results.Any())
+            {
+                return new OkObjectResult(results);
+            }
+            return new NotFoundResult();
+        }
+
+        [HttpGet]
         [Route("api/monitor/latest")]
         public async Task<IActionResult> GetLatest()
         {
