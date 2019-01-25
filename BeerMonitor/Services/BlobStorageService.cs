@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
+using BeerMonitor.Interfaces;
+using BeerMonitor.BusinessLogic;
 
-namespace BeerMonitor
+namespace BeerMonitor.Services
 {
     public class BlobStorageService : IBlobStorageService
     {
-        private static string _blobName = "beerblobstorage";
-        private static string _blobKey = "TugmWwpwRm3iAPfRJwR55GTzEQYH5UijxhHaSefpEW1NSvoJMxDlpja/zXnPtf8VhEMYkR1ZcXBHyMe+lY1CYg==";
         private CloudTable _beerTable;
+        private TelemetryClient telemetry = new TelemetryClient();
 
         public BlobStorageService()
         {
-            StorageCredentials creds = new StorageCredentials(_blobName, _blobKey);
+            StorageCredentials creds = new StorageCredentials(ConfigurationManager.BlobName, ConfigurationManager.BlobKey);
             CloudStorageAccount storageAccount = new CloudStorageAccount(creds, true);
             var client = storageAccount.CreateCloudTableClient();
-            _beerTable = client.GetTableReference("beertempdata");
+            _beerTable = client.GetTableReference(ConfigurationManager.BlobTableName);
         }
 
         public async Task<bool> InsertTempAndHumidity(double temp, double humidity)
