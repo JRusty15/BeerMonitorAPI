@@ -26,7 +26,7 @@ namespace BeerMonitor.BusinessLogic
                 return false;
             }
 
-            if (dTemperature < 60 || dTemperature > 70)
+            if (dTemperature < ConfigurationManager.MinTemperature || dTemperature > ConfigurationManager.MaxTemperature)
             {
                 telemetry.TrackEvent("Temp out of bounds",
                     new Dictionary<string, string> { { "Temp", temp.ToString() }, { "Humidity", humidity.ToString() } },
@@ -37,7 +37,7 @@ namespace BeerMonitor.BusinessLogic
 
                 if (ambiantTemp.HasValue && targetTemp.HasValue)
                 {
-                    if (dTemperature < 60)
+                    if (dTemperature < ConfigurationManager.MinTemperature)
                     {
                         if (targetTemp.Value <= ambiantTemp.Value)
                         {

@@ -15,5 +15,7 @@ namespace BeerMonitor.BusinessLogic
         public static string BlobName =>_config["BlobName"];
         public static string BlobKey => _config["BlobKey"];
         public static string BlobTableName => _config["BlobTableName"];
+        public static int MinTemperature => int.Parse(_config["MinTemperature"]);
+        public static int MaxTemperature => int.Parse(_config["MaxTemperature"]);
     }
 }
