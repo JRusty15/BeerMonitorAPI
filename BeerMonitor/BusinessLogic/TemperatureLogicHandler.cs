@@ -39,7 +39,7 @@ namespace BeerMonitor.BusinessLogic
                 {
                     if (dTemperature < ConfigurationManager.MinTemperature)
                     {
-                        if (targetTemp.Value <= ambiantTemp.Value)
+                        if (targetTemp.Value <= ambiantTemp.Value && ambiantTemp.Value < ConfigurationManager.MaxThermostatTemperature)
                         {
                             await _nestService.SetTemperature(ambiantTemp.Value + 1);
                         }
@@ -50,7 +50,7 @@ namespace BeerMonitor.BusinessLogic
                     }
                     else
                     {
-                        if (targetTemp.Value >= ambiantTemp.Value)
+                        if (targetTemp.Value >= ambiantTemp.Value && ambiantTemp.Value > ConfigurationManager.MinThermostatTemperature)
                         {
                             await _nestService.SetTemperature(ambiantTemp.Value - 1);
                         }
